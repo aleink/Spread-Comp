@@ -165,7 +165,7 @@
       }
 
       // Calculate Adjusted SL (F2 = Pip Value + SL Pips)
-      const adjustedSl = pipValue + slPips;
+      const adjustedSl = slPips; // SL Pips are directly provided
 
       // Calculate Lot Size (G2 = Risk / ((Adjusted SL + Spread) * Pip Value))
       const lotSize = risk / ((adjustedSl + spread) * pipValue);
