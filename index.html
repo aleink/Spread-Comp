@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spread Cost Compensation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    .input-group {
+      margin: 10px 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      font-size: 18px;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+
+    .reset {
+      background-color: #ff4d4d;
+      margin-top: 10px;
+    }
+
+    button.reset:hover {
+      background-color: #e60000;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 16px;
+      text-align: left;
+      background-color: #fff3cd;
+      padding: 15px;
+      border-radius: 8px;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 22px;
+      }
+
+      label, input {
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 16px;
+      }
+
+      .note {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>SPREAD COST COMPENSATION</h1>
+  <div class="container">
+    <div class="input-group">
+      <label for="risk">Risk Amount ($):</label>
+      <input type="number" id="risk" placeholder="Enter Risk in Dollars">
+    </div>
+    <div class="input-group">
+      <label for="target">Target Profit ($):</label>
+      <input type="number" id="target" placeholder="Enter Target Profit in Dollars">
+    </div>
+    <div class="input-group">
+      <label for="pipValue">Pip Value ($):</label>
+      <input type="number" id="pipValue" placeholder="Enter Pip Value (in Dollars per Pip)">
+    </div>
+    <div class="input-group">
+      <label for="slPips">Stop Loss (Pips):</label>
+      <input type="number" id="slPips" placeholder="Enter Stop Loss (in Pips)">
+    </div>
+    <div class="input-group">
+      <label for="spread">Spread (Pips):</label>
+      <input type="number" id="spread" placeholder="Enter Spread (in Pips)">
+    </div>
+
+    <button onclick="calculate()">Calculate</button>
+    <button class="reset" onclick="resetForm()">Reset</button>
+
+    <div class="result">
+      <p><strong>Adjusted Stop Loss (Pips):</strong> <span id="adjustedSl">0</span></p>
+      <p><strong>Lot Size:</strong> <span id="lotSize">0</span></p>
+      <p><strong>Pips for TP:</strong> <span id="pipsTp">0</span></p>
+    </div>
+
+    <!-- Explanatory Note -->
+    <div class="note">
+      <strong>How to find the Pip Value:</strong> <br>
+      To determine the Pip Value, set a limit order using **1 LOT** and place your Stop Loss exactly **1 pip** away from the entry point. The monetary value of the potential loss is the cost per pip, also known as the Pip Value.
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      // Get input values
+      const risk = parseFloat(document.getElementById('risk').value);
+      const target = parseFloat(document.getElementById('target').value);
+      const pipValue = parseFloat(document.getElementById('pipValue').value);
+      const slPips = parseFloat(document.getElementById('slPips').value);
+      const spread = parseFloat(document.getElementById('spread').value);
+
+      if (isNaN(risk) || isNaN(target) || isNaN(pipValue) || isNaN(slPips) || isNaN(spread)) {
+        alert("Please fill in all fields with valid numbers.");
+        return;
+      }
+
+      // Calculate Adjusted SL (F2 = Pip Value + SL Pips)
+      const adjustedSl = pipValue + slPips;
+
+      // Calculate Lot Size (G2 = Risk / ((Adjusted SL + Spread) * Pip Value))
+      const lotSize = risk / ((adjustedSl + spread) * pipValue);
+
+      // Calculate Pips for TP (H2 = (Target + (Spread * Pip Value * Lot Size)) / (Lot Size * Pip Value))
+      const pipsForTp = (target + (spread * pipValue * lotSize)) / (lotSize * pipValue);
+
+      // Display results
+      document.getElementById('adjustedSl').innerText = adjustedSl.toFixed(2);
+      document.getElementById('lotSize').innerText = lotSize.toFixed(2);
+      document.getElementById('pipsTp').innerText = pipsForTp.toFixed(2);
+    }
+
+    function resetForm() {
+      document.getElementById('risk').value = '';
+      document.getElementById('target').value = '';
+      document.getElementById('pipValue').value = '';
+      document.getElementById('slPips').value = '';
+      document.getElementById('spread').value = '';
+
+      document.getElementById('adjustedSl').innerText = '0';
+      document.getElementById('lotSize').innerText = '0';
+      document.getElementById('pipsTp').innerText = '0';
+    }
+  </script>
+
+</body>
+</html>
