@@ -164,11 +164,11 @@
         return;
       }
 
-      // Calculate Adjusted SL (F2 = Pip Value + SL Pips)
-      const adjustedSl = slPips; // SL Pips are directly provided
+      // Corrected: Adjusted SL = SL Pips + Spread
+      const adjustedSl = slPips + spread;
 
       // Calculate Lot Size (G2 = Risk / ((Adjusted SL + Spread) * Pip Value))
-      const lotSize = risk / ((adjustedSl + spread) * pipValue);
+      const lotSize = risk / ((adjustedSl) * pipValue);
 
       // Calculate Pips for TP (H2 = (Target + (Spread * Pip Value * Lot Size)) / (Lot Size * Pip Value))
       const pipsForTp = (target + (spread * pipValue * lotSize)) / (lotSize * pipValue);
